@@ -1,0 +1,946 @@
+\documentclass[a4paper,12pt,italian,towside]{article}
+\usepackage[latin1]{inputenc}
+% Comment the following line to deny the usage of umlauts and other non-ASCII characters
+\usepackage[italian]{babel}
+
+%pack per link
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue}
+
+%pack per colori
+\usepackage{xcolor}
+\usepackage{xcolor,listings}
+
+%pack tabelle
+\usepackage{graphicx}
+
+%lettere modalit\`a mate
+\usepackage{amssymb}
+
+%numero sub par da inserire nell indice
+\setcounter{tocdepth}{4}
+
+\usepackage{latexsym}
+
+%intestazioni e pie pagina
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\chead{}
+\cfoot{\thepage}
+\lhead{}
+\renewcommand{\headrulewidth}{0.4pt}
+
+%Formattazione per codice SQL
+\usepackage{textcomp}
+\usepackage{color}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{HTML}{C42043}
+\definecolor{codeblue}{HTML}{0000FF}
+\definecolor{backcolour}{HTML}{F2F2F2}
+\definecolor{bookColor}{cmyk}{0,0,0,0.90}  
+\color{bookColor}
+
+\lstset{upquote=true}
+
+\lstdefinestyle{mystyle}{  
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{codeblue},
+	numberstyle=\footnotesize\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\footnotesize,
+	breakatwhitespace=false,         
+	breaklines=true,                 
+	captionpos=b,                    
+	keepspaces=true,                                   
+	numbersep=-10pt,                  
+	showspaces=false,                
+	showstringspaces=false,
+	showtabs=false,      
+}
+\lstset{style=mystyle} 
+
+
+%java
+\usepackage {listings}
+\lstset{language=Java}
+
+%*************************************************************************%
+% Start the document
+\begin{document}
+
+
+
+\begin{titlepage}
+	\centering
+	\includegraphics[scale= 0.2]{res/unipd.png} \centering 
+	{\huge \\ \medskip Riassuntazzo I.A. \\ \medskip   \normalsize Giovanni Sissa \\ \medskip A.A 2018/2019\par }
+	
+
+\end{titlepage}
+
+
+
+\newpage
+
+%indice
+\tableofcontents
+
+\newpage
+% *****sezione1*****
+\section{Agenti e strategie di ricerca}
+
+    \subsection{Algoritmi Costruttivi}
+	Per problemi di una certa complessit\`a una ricerca \textbf{esaustiva} non \`e praticabile. La scelta di quale stato espandere nell'albero di ricerca prende il nome di \textbf{strategia}. Esistono strategie informate, dette \textbf{euristiche}, o non informate, dette \textbf{blid}.
+	Per capire la bontà delle strategie si valutano 4 criteri:
+	\begin{itemize}
+		\item [-]\textbf{Completezza} : la strategia garantisce di trovare una soluzione se esiste?
+		\item [-]\textbf{Complessit\`a temporale} : quanto tempo occorre per trovare una soluzione?
+		\item[-]\textbf{Complessit\`a spaziale} : quanta memoria occorre per trovare la soluzione?
+		\item[-]\textbf{Ottimalit\`a} : la strategia trova la soluzione ottima? quanto \`e buona la soluzione trovata?
+
+	\end{itemize}{}
+	Poiché questi algoritmi di ricerca si occupano di costruire una soluzione aggiungendo componenti a una situazione di partenza in un particolare ordine si dicono \textbf{Algoritmi costruttivi}
+	\subsubsection{Strategie Blind}
+	\paragraph{Breadth first o ricerca in ampiezza}
+	\subparagraph{}
+	La \textbf{profondit\`a} del nodo radice \`e 0. La profondit\`a di ogni altro nodo \`e la profondit\`a del padre +1. \textbf{Espande sempre i nodi meno profondi dell'albero}. Nel caso peggiore con profondit\`a dell'albero $d$ e fattore di ramificazione $b$ il numero massimo di nodi da esplorare \`e  $b^d$. 
+	\begin{itemize}
+		\item [-] Svantaggi: grande spreco di memoria e complessit\`a temporale elevata (entrambi $b^d$ per costo temporale o di memoria) .
+		\item[-]  Vantaggio: ritorna sempre il cammino a costo minimo se il costo coincide con la profondit\`a.
+	\end{itemize}
+	
+	\newpage
+	\paragraph{Depth first o ricerca in profondit\`a}
+	\subparagraph{}
+	\textbf{Espande per primi sempre i nodi pi\`u profondi}. A parit\`a di profondit\`a sceglie un nodo arbitrario 
+	\begin{itemize}
+		\item [-] Svantaggio: complessit\`a temporale analoga a Breadth first; numero massimo di nodi espansi nel caso peggiore $b^d$.
+		\item[-]  Vantaggio: modesta occupazione di memoria $b*d$.
+	\end{itemize}
+	
+	\subsubsection{Strategie Informate}
+	Conoscendo il problema o il gioco decido quali rami espandere e quali no. L'intelligenza di un sistema non si misura in termini di capacit\`a di ricerca ma in capacit\`a di utilizzare la conoscenza sul problema per eliminare il pericolo di espansione combinatoria. \par L'intelligenza di un sistema sta dunque nella saggia decisione di cosa fare ad ogni step.
+	\par Le \textbf{Funzioni di valutazione} danno una \textbf{stima computazionale dello sforzo} per raggiungere lo stato. Attenzione: il tempo speso a valutare la funzione di valutazione (o Euristica) per la scelta di quale nodo espandere deve corrispondere ad una riduzione nella dimensione dello spazio esplorato. Trade-off tra tempo per risolvere il problema (livello base) e tempo per scegliere come risolvere il problema (meta-livello).
+	
+	\paragraph{Best First}
+	\subparagraph{} Usa una \textbf{funzione di valutazione} che calcola un numero che rappresenta quanto un nodo sia desiderabile relativamente da espandere. In altre parole per ogni figlio mi calcolo un costo e espando solo quello di costo minore. Si segue il miglior candidato e basta.
+	\begin{itemize}
+		\item []\textbf{Best-first vuol dire scegliere come nodo da espandere quello che sembra pi\`u desiderabile.}
+		\item [] \textbf{QueuingFn} = inserire i successori in ordine di desiderabilit\`a ovvero in ordine di costo crescente. 
+		\item [] \textbf{Criticit\`a}: non \`e detto trovi la soluzione migliore ovvero il cammino migliore per una soluzione. Non tiene cio\`e conto delle profondit\`a: un nodo goal a profondit\`a 3 ma con costo 4 in un genitore non sar\`a mai valutato fintanto che ci sono figli con costo minore di 4.
+	\end{itemize}
+	Questo tipo di approccio \`e anche detto greedy.
+	Ricerca A*  caso particolare di best first.
+		
+	\paragraph{Algoritmo A*}
+	\subparagraph{}
+		Invece di tenere solo in considerazione il costo relativo di espandere un nodo, considera anche come costo il raggiungimento del nodo dalla radice.
+		Espandiamo quindi i nodi in ordine crescente di:
+		\boldmath
+		\begin{equation}
+			f(n) = g(n)+h'(n)
+		\end{equation}
+		\unboldmath
+		Dove $g(n)$ \`e la profondità del nodo e $h(n)$ \`e la distanza dal goal ovvero la mia euristica. Combina i vantaggi della ricerca in salita (efficienza) e della ricerca a costo uniforme (ottimalit\`a e completezza).\newline \par\textbf{Pesudocodice A*:}
+		\begin{itemize}
+			\item [0)] Sia L la lista dei nodi iniziali del problema.
+			\item [1)] Sia n di L per cui \`e minima $f(n) = g(n)+h'(n)$. Se L \`e vuoto fallisci.
+			\item [2)] Se n \`e il goal fermati e return n e la strada fino a lui.
+			\item [3)] Altrimenti rimuovi n da L e aggiungi a L tutti i figli di n con label la strada percorsa partendo dal nodo iniziale e ritorna a 2).
+		\end{itemize}
+		Esempio nelle slide da pagina 61. Nota sulle euristiche: si possono definire pi\`u euristiche ammissibili.\\
+		\par\textbf{Estensione A*: da alberi a grafi.} Assumere che i problemi siano sempre alberi \`e semplicistico: in un gioco come quello del filetto si pu\`o infatti tornare ad uno stato precedentemente esplorato o scartato. I figli possono contenere cio\`e nei propri figli un padre o un nonno (loop). Soluzione \`e mantenere due liste una di nodi chiusi da non ri esaminare e una di nodi aperti ancora da esaminare. \newline
+		\par\textbf{Pesudocodice A* in grafi:}
+		\begin{itemize}
+			\item [0)] Sia $L_a$ la lista dei nodi iniziali del problema.
+			\item [1)] Sia n di  $L_a$ per cui \`e minima $f(n) = g(n)+h'(n)$. Se  $L_a$ \`e vuoto fallisci.
+			\item [2)] Se n \`e il goal fermati e return n e la strada fino a lui.
+			\item [3)] Altrimenti rimuovi n da  $L_a$. Inserisci n in  $L_c$ (lista dei nodi chiusi) e aggiungi a  $L_a$ tutti i figli di n con label la strada percorsa partendo dal nodo iniziale. Se un nodo figlio \`e gi\`a in  $L_a$, non raggiungerlo ma aggiornalo con la strada migliore che lo connette al nodo iniziale. Se un nodo figlio \`e gi\`a in  $L_c$ non aggiungerlo a  $L_a$ ma se il suo costo \`e migliore aggiorna il costo e il costo dei nodi gi\`a espansi che da lui dipendevano.
+			\item [4)] Ritorna a 2).
+		\end{itemize}
+ 	
+\subsection{Ricerca Locale}
+	
+	\par Gli \textbf{algoritmi di ricerca locale} partono da una soluzione iniziale e iterativamente cercano di rimpiazzare la soluzione corrente con una migliore in un intorno della soluzione corrente. In questi casi non interessa la strada per raggiungere l'obbiettivo.	 
+	\par Si basa sulla esplorazione dei vicini, essi possono migliorare la soluzione corrente mediante modifiche locali.
+	
+	\paragraph{Struttura dei vicini o neighborhood:}funzione $F$ che assegna a ogni soluzione $s$ dell'insieme delle soluzioni $S$ un insieme di soluzione $N(s)$ sottoinsieme di $S$. Si capisce che la scelta di $F$ \`e fondamentale per la bont\`a del algoritmo.\\
+
+	La soluzione trovata da una ricerca locale non \`e detto sia ottima globalmente ma pu\`o essere un miglioramento locale. Pi\`u largo \`e il vicinato pi\`u \`e probabile che un massimo o minimo locale sia anche globale e quindi ad un aumento del vicinato aumenta la qualit\`a della soluzione a discapito del costo computazionale.
+	
+	\paragraph{Iterative improvement:}l'algoritmo base a cui ci si riferisce di solito. Una soluzione viene generate in modo casuale o mediante un algoritmo costruttivo. Su questa soluzione viene lanciato ricerca locale che prova a migliorarla. Se tra i vicini vi \`e una soluzione migliore, la si seleziona e si ri lancia ricerca locale su di questa, altrimenti \`e stato trovato un max o min locale. Un esempio di questo algoritmo \`e di immaginarsi un hill climbing (vedi slide 69 e seguire).
+	
+	\paragraph{Criticit\`a di ricerca locale:}
+	\begin{itemize}
+		\item \textbf{Massimi locali:}stati migliori di tutti i vicini ma peggiori di altri stati fuori dal vicinato: l'algoritmo non ci fa uscire da qui.
+		\item \textbf{Pianori o altopiani:}	zone piatte nello stato di ricerca, tutti i vicini con lo stesso valore. L'algoritmo non sa in che direzione muoversi.
+		\item \textbf{Crinali:}zona adiacente migliore ma verso la quale non \`e possibile muoversi.
+	\end{itemize}
+
+	Una possibile e semplice soluzione a queste criticit\`a \`e lanciare pi\`u volte l'algoritmo di ricerca locale partendo da soluzioni iniziali diverse. Si salva la soluzione migliore dopo una serie di tentativi (bound dovuto al tempo di CPU o numero di iterazioni).
+	
+\subsection{Meta-euristici}
+In questa classificazione ricadono l'insieme di algoritmi, tecniche e studi relativi all'applicazione di criteri euristici per risolvere problemi di ottimizzazione.
+
+	\subsubsection{Ant colony optimization} Solo citati in questo corso, sono ispirati al comportamento di colonie di insetti. Tali insetti mostrano infatti una capacit\`a globale nel trovare il cammino migliore dal cibo alla colonia. Questo ha dato nascita ad algoritmi di ricerca cooperative.
+	
+	\subsubsection{Algoritmi genetici}
+	Sono algoritmi evolutivi ispirati ai modelli delle specie in natura. Principio di selezione naturale: si favoriscono gli individui pi\`u adatti ad uno specifico ambiente per sopravvivere e riprodursi. Ogni individuo \`e una soluzione o cromosoma, con relativo valore della funzione obbiettivo detta \textbf{fitness}. I tre principali operatori sono: \textbf{Selezione; Mutazione; Ricombinazione.}\par La criticit\`a sta nel ben rappresentar un gioco o uno stato del problema in un cromosoma e nel bene rappresentare la funzione Fitness. 
+	\paragraph{Sopravvive il pi\`u adatto:}un pool di individui iniziali, solitamente generati randomicamente, vengono fatti riprodurre per formare nuovi individui che ereditano il patrimonio genetico dei genitori. Si introducono mutazioni casuali. Ogni individuo \`e rappresentato mediante il suo genotipo, il \textbf{cromosoma} \`e una sequenza ordinata di L \textbf{alleli}.\par Definizione di una funzione di \textbf{fitness}: individui con alta fitness avranno pi\`u probabilit\`a di essere selezionati per la riproduzione. Lo scopo dell'agente \`e selezionare l'individuo con fitness migliore. Nota la fitness potrebbe non coincidere con la funzione obbiettivo.\\
+	\begin{lstlisting}
+int_population()      // genera una popolazione iniziale random.
+for i:=1 to max_gen   // numero massimo di cicli.
+  evaluation()        // calcola la fitness per ogni individuo.
+  section()           // seleziona N individui per riprodurre.
+  crossover()         // ricombinazione genetica tra N/2 coppie.
+  mutation()          // aggiunge un fattore randomico in figli.
+  replacement()       // scarta gli individui a fitness bassa.
+end 
+return best element
+	\end{lstlisting}
+	
+	\paragraph{Tecniche pi\`u usate e varianti}
+	\begin{itemize}
+		\item Nella \textbf{selezione} la tecnica pi\`u usata \`e la funzione di probabilit\`a uniforme sulla fitness:
+		\[ \pi_{i}=\frac{f(i)}{\sum_{j=1} f(j)} \]
+		Possono essere adottati tanti altri possibili schemi di soluzione.
+		\item Nel \textbf{crossover} lo schema pi\`u usato \`e quello a un punto: si sceglie un punto $l$ random nel cromosoma tra 1 e L; un figlio erediter\`a gli alleli da 1 a $l$-1 da un genitore e gli altri dall'altro; l'altro figlio il contrario. Varianti sono a due punti o random dai genitori. Bisogna prestare attenzione nel caso di presenza di vincoli.
+		\item Nella \textbf{mutazione} si pu\`o utilizzare un operatore non uniforme come ad esempio:
+		\[ x_{k}'= x_{k} + \Delta(t, x_{k}) \]
+		dove $\Delta$ \`e un numero casuale tale $x_{k}'$ che cada nel intervallo di definizione.
+	\end{itemize}
+	
+	\subsection{Constraint Programming}
+	Molti problemi di IA possono essere visti come CP. \textbf{Obbiettivo: trovare uno stato del problema che soddisfi un dato insieme di vincoli.}
+	
+	\subsubsection{CP attraverso un esempio: N queens}
+	\begin{itemize}
+		\item Le 8 regine vengono rappresentate con le variabili $\mathbf{x_1,x_2,...,x_n}$. Il pedice si riferisce alla colonna occupata, a dominio $[1, ... ,n]$.
+		\item l'istanziazione di $\mathbf{x_h}$ al valore $\mathbf{k}$ indica che la regina sulla colonna h sta sulla riga k.
+		\item Vincoli:\
+		\begin{itemize}
+			\item [] $1\leq x_i \leq  n \ \ \ \ \ \ \ \ \ \ \ \ \ per \ \ 1 \leq i \leq n$
+			\item [] $ x_i \not= x_j  \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ per \ \ 1 \leq i\le j \leq n$
+			\item [] $x_i \not= x_j+(j-1) \ \ \ \ per \ \ 1 \leq i\le j \leq n$
+			\item [] $x_i \not= x_j-(j-1) \ \ \ \ per \ \ 1 \leq i\le j \leq n$
+		\end{itemize}
+		Il primo vincolo si dice unario gli altri binari.
+		
+	\end{itemize}
+	\subsubsection{CP o CSP: definizione}
+	Formalmente un CSP (Constraint satisfaction problem) pu\`o essere definito su un insieme finito di variabili $\mathbf{(x_1,x_2, ... , x_n)}$, i cui valori appartengono ai domini finiti di definizione $\mathbf{(D_1,D_2,..., D_n)}$, e su un insieme di vincoli. 
+	Un vincolo $c(x_{i1},x_{i2}, ... , x_{in})$ tra k variabili \`e un sottoinsieme del prodotto cartesiano $(D_{i1} * D_{i2} * ... * D_{in})$ che specifica quali valori delle variabili sono compatibili con le altre. Tale sottoinsieme non deve essere definito esplicitamente ma \`e rappresentato in termini di relazione. Una soluzione prevede l'assegnamento di tutte le variabili. (soluzione ammissibile dal problema se rispetta i vincoli).
+	\paragraph{Albero decisionale:}
+	in csp si pu\`o far corrispondere ogni problema ad un albero. Ordinando le variabili ogni livello $i$ corrisponde all'assegnazione del $i$-esima variabile. Ogni foglia rappresenta un assegnamento di tutte le variabili e quindi una soluzione ammissibile se tutti i vincoli sono rispettati. La ricerca equivale all'esplorazione di un albero: $n$ variabili tutte a cardinalit\`a d il numero di foglie da esplorare \`e $d^n$.
+	
+	\subsubsection{Propagazione}
+	Algoritmi intenti a prevenire fallimenti nella ricerca nell'albero. \textbf{Pruning a priori:} utilizzare relazioni tra le variabili (ovvero i vincoli) per ridurre lo spazio di ricerca. Vengono rimossi i rami sicuramente fallimentari limitando il backtracking. \textbf{Algoritmi che fanno uso di propagazione sono Forward-checking e (partial and full)Look-ahead, NON fanno uso di propagazione Generate and test (GT) e Standard Backtracking (SB)}
+	
+	\subsubsection{Algoritmi di ricerca di soluzioni in CP: Vincoli a posteriori}
+	\paragraph{Generate and test}
+	\subparagraph{}
+	L'interprete del linguaggio sviluppa a vista un albero decisionale percorrendolo in profondit\`a assegnando valori alle variabili senza preoccuparsi di verificare la consistenza con gli altri vincoli. Solo in un secondo momento l'algoritmo verifica che la soluzione generata soddisfi i vincoli del problema. Esplora tutte le permutazioni delle soluzioni e se la soluzione del problema non soddisfa i vincoli scatta il backtracking. \textbf{Inefficienza:} i vincoli sono usati a posteriori, a ricerca gi\`a avvenuta.
+
+	\paragraph{Standard Backtracking}
+	\subparagraph{}	
+	Migliora GT ma vincoli ancora usati a posteriori. Ad ogni istanziazione di una variabile si preoccupa di verificare la coerenza delle variabile appena istanziata con quelle gi\`a assegnate. Non si prosegue nella ricerca in un ramo che ai primi livelli gi\`a fallisce.
+	\textbf{Pruning a posteriori:} lo spazio di ricerca \`e ridotto ma dopo il tentativo. Problema: in alcune situazioni potrebbe avvenire che l'istanziazione dell'ultima variabile crea problemi. Backtracking molto costoso.
+	
+	\subsubsection{Algoritmi di ricerca di soluzioni in CP: Vincoli a Priori}
+	Come Standard Backtracking ma in pi\`u controllano i vincoli tra variabili gi\`a legate a variabili ancora da istanziare e anche in gradi diversi (coppie o tuple). La propagazione ha l'effetto di ridurre i domini delle variabili non ancora istanziate.
+	
+	\paragraph{Forward checking}
+	\subparagraph{}
+	Utilizzato dopo ogni istanziamento: i vincoli vengono propagati e cio\`e si eliminano i valori incompatibili con quello appena istanziato dai domini delle variabili ancora libere. Vincente quando le ultime variabili risultano ora poco libere (pochi valori rimasti nei domini): queste risultano molto vincolate e quindi facili da istanziare. 
+	\begin{itemize}
+		\item [-] Se il dominio dell'ultima variabile consiste in un solo valore, assegnamento senza costo computazionale.
+		\item [-] Se un dominio durante la computazione divine vuoto, il tentativo fallisce senza proseguire in tentativi e Backtracking.
+	\end{itemize}
+	L'idea \`e che \textbf{l'assegnazione di un valore ad una variabile ha delle ripercussioni sull'insieme di valori disponibili per le altre. In questo modo i vincolo agiscono forward limitando lo spazio delle soluzioni prima di provare tentativi su di esso.}
+	
+	\paragraph{Look Ahead}
+	\subparagraph{}
+	Tecnica pi\`u completa per il pruning a priori. Ad ogni istanziazione viene controllata la compatibilit\`a con i vincoli del problema rispetto alle variabili gi\`a istanziate in precedenza (come generate and test) e le successive (variabili ancora libere).
+	In pi\`u viene sviluppato il \textbf{Look Ahead} che controlla l'esistenza, nei domini associati alle variabili ancora libere, di valori compatibili con i vincoli contenenti solo variabili non istanziate. I domini associati a ogni variabile vengono ridotti propagando anche le relazioni contenenti coppie di variabili non istanziate. Viene verificata la possibilit\`a di una futura assegnazione consistente tra le variabili libere (a coppie).
+	 
+	\subparagraph{Partial Look Ahead (PLA):} all'istanziazione di $x_i$ si ha  una propagazione dei vincoli contenenti la variabile appena istanziata nelle variabili non ancora instaziate (da $x_{i+1}$ in poi). Per ogni variabile $x_{i+1} ... x_n$ deve esistere una valore $k$ per il quale sia possibile trovare almeno un valore compatibile son k per tutte le variabili rimanenti e "successive". Es slide 117.
+	
+	\subparagraph{Full Look Ahead (FLA)} il controllo non \`e fatto solo sulle variabili successive ma anche sulle precedenti non assegnate. Propago in tutte le variabili ancora libere non solo nelle "successive".
+	
+	\subsubsection{Euristiche in CP}
+	Questi algoritmi soffrono di due gradi di libert\`a: la scelta dell'ordinamento delle variabili e la scelta dell'ordine delle selezione dei valori all'interno dei domini.
+	Le euristiche agiscono su questi gradi di libert\`a per garantire soluzioni in tempi pi\`u rapidi anche per problemi complessi.
+	
+	\paragraph{Euristiche per la selezione della variabile:} determinano quale debba essere la prossima variabile da istanziare. Seguono le due euristiche pi\`u usate, che selezionano come la prossima variabile da istanziare la pi\`u "difficile". 
+	\begin{itemize}
+		\item [-] \textbf{First fail} o Minimum Remeaning Values: sceglie la variabile  con dominio a cardinalit\`a minore.
+		\item [-] \textbf{Most-constrained princile:} sceglie al variabile legata a pi\`u vincoli.
+	\end{itemize}
+
+	\paragraph{Euristiche per la selezione dei valori:}
+	Determinano quale valore assegnare alla prossima variabile selezionata. Si segue in genere il principio \textbf{least constraining principle} che cerca di scegliere prima il valore che si ritiene abbia pi\`u probabilit\`a di successo. 
+	
+	\paragraph{Euristiche Statiche:} determinano l'ordine in cui le variabili (o i valori) vengono scelti prima di iniziare la ricerca e tale ordine rimane invariato. Esempio: nel dominio scelgo valore minimo, assegno come prossima variabile la i+1.
+	
+	\paragraph{Euristiche dinamiche:} scelgo la prossima selezione da effettuare ogni volta che una selezione viene richiesta.
+	
+	Le euristiche dinamiche sono potenzialmente migliori. La determinazione dell'euristica perfetta \`e un problema in genere con la stessa complessit\`a del problema di partenza: compromesso.
+	
+	\subsubsection{Algoritmi di ricerca di soluzioni in CP: Tecniche di consistenza}
+	Ridurre il problema originale eliminando dai domini delle variabili i valori che non possono comparire in una soluzione finale. Possono essere applicate staticamente o ad ogni assegnamento come potenti tecniche di propagazione. Tutte le tecniche sono basate sulla rappresentazione di un problema come una rete (grafo) di vincoli. Gli archi possono essere orientati (esempio vincolo $>$) o meno (vincolo $=$).
+	\par Per ogni CSP esiste un \textbf{constraint graph} i cui nodi rappresentano variabili e gli archi vincoli. Vincoli binari sono archi da una variabile ad un altra, vincoli unari sono archi entranti e uscenti dallo stesso nodo.
+	
+	\paragraph{Node consistency o consistenza di grado 1:}
+		\begin{itemize}
+			\item [-] Un nodo \`e consistente se \textbf{per ogni} valore $x_i \in D_i$ il vincolo unario su $x_i$ \`e soddisfatto.
+		\end{itemize}
+
+	\paragraph{Arc consistency o consistenza di grado 2:}
+		\begin{itemize}
+			\item [-] Dato un grafo node consistent, un arco $A(i,j)$ \`e consistente se \textbf{per ogni} valore $x \in D_i$ esiste almeno un valore $Y \in D_j$ tale che il vincolo tra i e j $P(i,j)$ sia soddisfatto.
+		\end{itemize}
+
+	\paragraph{Procedimento iterativo:} La rimozione di alcuni valori dal dominio di una variabile rende necessarie ulteriori verifiche che coinvolgono i vincoli contenenti la variabile stessa. Quindi questo procedimento deve essere ripetuto finché la rete non raggiunge uno stato di QUIESCENZA o stabile.\textbf{Vs FLA, AC ha un maggior costo computazionale ma maggior pruning. FLA \`e detto AC/2} 
+	
+	\paragraph{Path consistency o consistenza di grado 3:}
+		\begin{itemize}
+			\item [-] Dato un grafo arc consistent, un cammino tra i nodi $(i,j,k)$ \`e path consistente se, \textbf{per ogni} valore $x \in D_i$ e $Y \in D_j$ (arche node consistenti) esiste un valore $z \in D_z$ che soddisfa i vincoli $P(i,k)$ e $P(k,j)$.
+		\end{itemize}
+
+	\paragraph{Teorema Path consistency }
+		\begin{itemize}
+			\item [-]\textbf{Dato un constraint-graph completo }(ogni nodo connesso ad ogni altro nodo) \textbf{se ogni cammino di lunghezza 2 \`e path-consistente allora l'intera rete \`e path consistente.} 
+		\end{itemize}
+		Un constraint-graph non completo pu\`o essere reso completo aggiungendo archi completamente rilassati ($<$ or = or $>$) tra due nodi non collegati. \par In generale se un grafo a $n$ variabili \`e $k$-consistente con $k<n$ allora per trovare la soluzione \`e necessaria una ricerca nei domini ripuliti. Se ha $n$ nodi e \`e $n$-consistente allora si pu\`o dare una soluzione senza ricerca. \par Esiste un algoritmo generale per rendere una rete a $k$ variabili $k$-consistente ma ha una complessit\`a esponenziale in $k$ e costa cio\`e come una ricerca nella rete originale.
+		
+	\subsubsection{COP} 
+	Abbiamo finora parlato di CSP ovvero di problemi di soddisfacibilit\`a. Si pu\`o per\`o estendere il ragionamento a problemi di ottimizzazione con vincoli COP. Un COP \`e un CSP in cui si aggiunge un obbiettivo.\textbf{ COP \`e quindi descrivibile formalmente come un CSP in cui l'obbiettivo non \`e trovare una soluzione ma trovare la soluzione ottima}. \par Dato un algoritmo in grado di risolvere CSP si pu\`o allora utilizzarlo per risolvere COP aggiungendo una variabile che descrive l'obbiettivo. Ad ogni soluzione trovata in CSP viene aggiunto un nuovo vincolo che garantisce che ogni nuova soluzione abbia valore obbiettivo migliore. Questo procedimento continua finché non sar\`a pi\`u possibile trovare una soluzione migliore. L'ultima trovata sarà la soluzione ottima. 
+
+\newpage
+\section{Giochi}
+I giochi hanno le seguenti proprietà :
+	\begin{itemize}
+		\item [-] Due giocatori, \textbf{le mosse sono alternate} e le funzioni di utilit\`a complementari: vince e perde.
+		\item [-] Sono giochi con \textbf{conoscenza perfetta} in cui i due giocatori hanno la stessa informazione.
+	\end{itemize}
+Non sono quindi giochi i giochi di carte per esempio, quelli in cui la conoscenza \`e diversa per ogni giocatore. Si possono affrontare con altre tecniche. \par Lo svolgersi del gioco si pu\`o interpretare come un albero in cui la radice \`e la posizione di partenza e le foglie le posizioni finali.
+
+	\subsection{Algoritmo min-max}
+	L'algoritmo minmax \`e progettato per determinare la strategia ottimale per "max" e suggerigli di conseguenza la prima mossa migliore da compiere. Per fare questo ipotizza che "min" faccia sempre la scelta per lui pi\`u favorevole. Non interessa la strada ma solo la prossima mossa.
+	
+		\subsubsection{Labeling}
+		L'albero delle mosse viene etichettato in questo modo: 
+			\begin{itemize}
+				\item [] \textbf{Un nodo con max che deve muovere viene etichettato con il massimo dei labels dei figli. Viceversa per min}. 
+			\end{itemize}
+		Deve essere nota una funzione che dato un nodo, stato del gioco, mi dica la sua bont\`a per min o per max: una funzione obbiettivo. La bont\`a di tale funzione migliora le prestazioni dell'algoritmo.
+		
+		\subsubsection{Labeling di un nodo $<n>$: algoritmo breadth-first} 
+			\begin{itemize}
+				\item[1)] Espandi l'intero albero sotto n.
+				\item[2)] Valuta le foglie come vincenti per min o max.
+				\item[3)] Seleziona un nodo $n_i$ senza label i cui figli sono labeled. Se non esiste ritorna il valore assegnamento a n.
+				\item[4)] Se $n_i$ \`e un nodo in cui muove min assegna ad esso il minimo del valore dei figli, se deve muovere max il massimo. Ritorna a 3.
+			\end{itemize}
+		Complessit\`a spazio temporale per $b$ fattore di ramificazione e $d$ livelli: $\mathbf{b^d}$
+		
+		\subsubsection{Labeling di un nodo $<n>$: algoritmo depth-first}
+			\begin{itemize}
+				\item[1)] Metti in L i nodi non ancora espansi di $<n>$.
+				\item[2)] Sia $x$ il primo nodo di L. Se x = $<n>$ e c'\`e un valore assegnato a esso ritorna tale valore.
+				\item[3)] Altrimenti se $x$ ha un valore assegnato $V_x$, sia $p$ il padre di x con valore provvisorio $V_p$, se $p$ \`e un nodo min $V_p = min(V_p, V_x)$, se $p$ \`e un nodo max $V_p = max(V_p, V_x)$. Rimuovi $x$ da L e torna a step 2.
+				\item[4)] Se $x$  non \`e assegnato un valore ed \`e un nodo foglia, valuta la sua bont\`a per max min. Lascia x in L per poter valutare i suoi antenati e vai al 2.
+				\item[5)] Se a x non \`e stato assegnato un valore e non \`e un nodo foglia assegna $V_x = -inf$ se \`e un max $V-x = +inf$ viceversa. aggiungi i figli di x a L \textbf{in testa} e ritorna allo step 2.
+			\end{itemize}
+			Complessit\`a temporale $\mathbf{O(b^d)}$
+			Complessit\`a spaziale $\mathbf{O(b*d)}$
+			
+		\subsubsection{Espansione limitata}
+		Espandere tutto l'albero \`e molto inefficiente. Shannon nel 1949: si guarda in avanti solo per un po' e si valutano le mosse fino ad un nodo non terminale ritenuto di successo. In pratica si applica minimax fino ad una certa profondit\`a. Si introduce una funzione di valutazione di bont\`a di un nodo $e(n)$. La raffinatezza di tale funzione dipende dalle applicazioni: trade off tra ricerca e bont\`a	della funzione.
+		\par Algoritmo breadth first diventa:
+		\begin{itemize}
+			\item[1)] Metti in L i nodi non ancora espansi di $<n>$.
+			\item[2)] Sia $x$ il primo nodo di L. Se x = $<n>$ e c'\`e un valore assegnato a esso ritorna tale valore.
+			\item[3)] Altrimenti se $x$ ha un valore assegnato $V_x$, sia $p$ il padre di x con valore provvisorio $V_p$, se $p$ \`e un nodo min $V_p = min(V_p, V_x)$, se $p$ \`e un nodo max $V_p = max(V_p, V_x)$. Rimuovi $x$ da L e torna a step 2.			
+			\item[4)] Se $x$  non \`e assegnato un valore ed \`e un nodo foglia, \textbf{oppure x \`e un nodo che decidiamo di non espandere ulteriormente}, valuta $e(x)$. Lascia x in L per poter valutare i suoi antenati e vai al 2).
+			\item[5)] Se a x non \`e stato assegnato un valore e non \`e un nodo foglia assegna $V_x = -inf$ se \`e un max $V-x = +inf$ viceversa. aggiungi i figli di x a L \textbf{in testa} e ritorna allo step 2.
+		\end{itemize}
+	
+		\paragraph{Quanto espando?}
+		\subparagraph{} Nota che se $e(x)$ fosse perfetta basterebbe espandere i figli del nodo di interesse. \textbf{Soluzione possibile: espando sempre fino a una certa profondit\`a $\mathbf{p}$.}
+		\begin{itemize}
+			\item{} Problema: mosse pi\`u complicate tatticamente dovrebbe essere valutate con pi\`u profondit\`a fino alla quiescenza (valori $e(n)$ che variano poco).
+		\end{itemize}
+		A volte conviene effettuare una ricerca mirata sulla mossa selezionata.
+		
+		\subsubsection{Importante considerazione} 
+		Per quanto detto fin ora l'algoritmo minimax si basa sul concetto che nessun giocatore sbagli! Se un giocatore sbaglia devo ricalcolare al volo tutto l'albero!
+	
+	\subsection{Tagli alfa-beta}
+	
+	Tecnica per ridurre lo spazio di ricerca all'interno dell'albero. Si N un nodo all'interno dell'albero, se il giocatore ha una scelta migliore M a livello del nodo genitore o di qualunque antenato di N, N non sar\`a mai selezionato. Sia ALFA il valore della scelta migliore trovata sulla strada di MAX (il pi\`u alto) e BETA il valore della scelta migliore trovata sulla strada di MIN (il pi\`u basso), l'algoritmo aggiorna i valori di ALFA e BETA tagliando quando trova valori peggiori.
+	\begin{itemize}
+		\item [-] Se un ALPHA-value \`e maggiore o uguale di un Beta-value di un nodo discendente: stop alla generazione di discendenti di beta.
+		\item  [-] Se un BETA-value \`e minore o uguale di un Alpha-value di un nodo discendente: stop alla generazione di discendenti di alpha.
+	\end{itemize}
+
+		\subsubsection{Algoritmo alpha-beta}
+		\begin{itemize}
+			\item[1)] Metti in L i nodi non ancora espansi di $<n>$.
+			\item[2)] Sia $x$ il primo nodo di L. Se $x = <n>$ e c'\`e un valore assegnato a esso ritorna tale valore.
+			\item[3)] Altrimenti se $x$ ha un valore assegnato $V_x$, sia $p$ il padre di x. Se a x non \`e assegnato un valore vai al passo 5.
+			\begin{itemize}
+				\item [$\bullet$] Determiniamo se $p$ ed i suoi figli possono essere eliminati dall'albero. Se $p$ \`e un nodo min, sia alfa il massimo di tutti i correnti valori assegnati ai fratelli di $p$ e sei nodi min che sono antenati di $p$.
+				\item [$\bullet$] Se non ci sono questi valori alfa = -inf.
+				\item [$\bullet$] Se $V_x \leq alfa$ rimuovi tutti i suoi discendenti da L. (dualmente se $p$ \`e un max).
+			\end{itemize}
+			\item[4)] Se $p$ non pu\`o essere eliminato, sia  $V_p$ il suo valore corrente. Se $p$ \`e un nodo min, $V_p = min(V_p, V_x)$, se $p$ \`e un nodo max $V_p = max(V_p, V_x)$. Rimuovi $x$ da L e torna a step 2.
+			\item[5)] Se $x$  non \`e assegnato un valore ed \`e un nodo foglia, \textbf{oppure x \`e un nodo che decidiamo di non espandere ulteriormente}, valuta $e(x)$. Lascia x in L per poter valutare i suoi antenati e vai al 2).
+			\item[6)] Se a x non \`e stato assegnato un valore e non \`e un nodo foglia assegna $V_x = -inf$ se \`e un max $V-x = +inf$ viceversa. aggiungi i figli di x a L \textbf{in testa} e ritorna allo step 2.
+		\end{itemize}
+	
+		\paragraph{NOTA:} alfa-beta opera su algoritmo depth-first! Dobbiamo in prima battuta arrivare a una foglia o al massimo livello che possiamo espandere, valutare la funzione di utilità del nodo e propagare il valore.
+	
+	\subsubsection{Conclusioni}
+	Ovviamente se valutiamo sempre i nodi peggiori, i nodi valutati successivamente risultano sempre nella linea corrente di ricerca e non c'\`e nessun taglio. Se valutiamo sempre il nodo migliore i restanti sono sempre tagliati, ma un caso del tutto teorico. \\
+	\textbf{Nel caso medio con distribuzione casuale dei valori ai nodi, i l numero di nodi da esplorare diventa circa $b^{{3\over4}d}$}.
+	
+\newpage
+\section{Rappresentazione della conoscenza}
+
+	\subsection{Dati e Pattern}
+	I dati sono gli ingrediente fondamentali del machine learning, dove il comportamento non \`e pre-programmato ma appreso dai dati stessi. Utilizzeremo spesso il termine \textbf{Pattern} per riferirci ai dati. Un pattern pu\`o essere pensato come \textbf{un membro di una classe descritto da valori}: un volto, un carattere scritto a mano, un'impronta digitale, un segnale sonoro, un frammento di testo, l'andamento di un titolo in borsa.
+	
+	\subsection{Tipo di Pattern}
+		\subsubsection{Numerici}
+		Valori associati a caratteristiche misurabili o conteggi.
+			\begin{itemize}
+				\item [$\Box$] Tipicamente continui ma anche discreti. In ogni caso soggetti ad ordinamento.
+				\item [$\Box$] Rappresentabili naturalmente come vettori n-dimensionali.
+				\item [$\Box$] Es: estrazione di caratteristiche da segnali audio (feature vectors), una Persona:[altezza, peso, lunghezza piede, ...]
+			\end{itemize}
+	
+		\subsubsection{Categorici}
+		Valori associati a caratteristiche qualitative e alla presenza/assenza di una caratteristica (yes/no values).
+			\begin{itemize}
+				\item [$\Box$] Non semanticamente mappabili in valori numerici.
+				\item [$\Box$] Es: Persona:[sesso, maggiorenne, colore occhi, gruppo sanguigno].
+				\item [$\Box$] Talvolta soggetti ad ordinamento: temperatura bassa, media o alta.
+				\item [$\Box$] Normalmente gestiti da sistemi a regole e alberi di classificazione.
+			\end{itemize}
+	
+		\subsubsection{Sequenze}
+		Pattern sequenziali con relazioni spazio o temporali.
+			\begin{itemize}
+				\item [$\Box$] Uno stream audio corrispondente alla pronuncia di una parola, una frase in linguaggio naturale, un video.
+				\item [$\Box$] Spesso di lunghezza variabile.
+				\item [$\Box$] La posizione nella sequenza e le relazioni con predecessori e successori sono importanti.
+				\item [$\Box$] Critico trattare sequenze con pattern numerici. Allineamento spazio temporale e memoria per tener conto del passato.
+			\end{itemize}
+		
+		\subsubsection{Altri dati strutturati}
+		Output  organizzati in strutture complesse quali alberi e grafi.
+			\begin{itemize}
+				\item [$\Box$] Applicazioni in bioinformatica, processa-mento del linguaggio naturale, ricognizione di parlato.
+				\item [$\Box$] esempio nella traduzione si una frase in linguaggio naturale l'output desiderato \`e l'insieme di parse tree plausibili.
+			\end{itemize}
+		
+	\subsection{Rappresentazione di Pattern}
+	
+		\subsubsection{Proteine}
+		Per poter essere usate in molti sistemi automatici le proteine vengono codificate in uno spazio vettoriale. Le proteine sono sequenze di amino-acidi. Gli amino-acido sono 20.
+		
+		\subparagraph{Amino acid composition (AS)}
+		conta gli amino acidi contenuti in una proteina normalizzando per la lunghezza della proteina $N$. 
+			\[ AS(i)=\frac{h(i)}{N} \; \ per \ ogni \ i \ \in [1...20]\]
+		Calcolando per ogni $i$, ovvero per ognuno dei 20 aminoacidi, ho un vettore lungo 20.
+		
+		\subparagraph{2-Gram (2G)}
+		rappresenta una proteina con $20^2$ feature, ogni feature \`e ottenuta contando il numero di occorrenze di una delle possibili coppie di aminoacidi, normalizzando per la lunghezza dell'aminoacido $N$.
+		
+		\[2G(k)= \biggl(\frac{h(i,j)}{N}\biggr)\ \ \ \ i,j \in [1...20] \ \ \ k = j+20(i-1) \]
+		
+		dove $h(i,j)$ \`e il numero di occorrenze du una coppia di amino-acidi $(i,j)$ in una proteina lunga $N$.
+		
+		\subparagraph{N-Gram (NG)} come 2G, non cerco coppie ma tuple lunghe $N$. Dimensione del pattern $20*20*...*20=20^N$.
+		
+		\subparagraph{Autocovariance approach (AC)} 
+		dato un parametro $m$ che denota la massima distanza tra due amino-acidi considerati, data una proteina $P = (p_1,p_2,...,p_N)$ e una propriet\`a fisico-chimica (propriet\`a dei singoli amino-acidi) $d$:
+		\begin{center}
+			\includegraphics[scale=0.5]{res/proteine.png} 
+		\end{center}
+		 	
+		$index(p_k, d)$ ritorna il valore della propriet\`a d per un amino-acido $p_k$, ci sono poi due fattori di normalizzazione cio\`e media e varianza.\\
+		$AC \in \mathbb{R}^{20+m}$
+		Probabilmente le prime $N$ fetures sono la probabilit\`a di estratte quell'amino-acido perch\`e sarebbe come fare formulone su steso amino-acido $p_k$, sembra simulare il comportamento di un array circolare.  
+		
+		
+	\subsubsection{DNA}
+	Anche per sequenze di DNA si possono usare le frequenza di occorrenza, in questo caso si parla di occorrenza della singola base azotata o di coppie, definito $R$ il vettore che memorizza la sequenza abbiamo:
+		\begin{center}
+			\includegraphics[scale=0.6]{res/DNAsemplice.png} 
+		\end{center}
+	
+	\subparagraph{Pseudo nucleic acid rapresentation}
+		\begin{center}
+			\includegraphics[scale=0.6]{res/DNA.png} 
+		\end{center}
+	
+	\subparagraph{Micro array DNA}
+	
+	Un microarray di DNA (comunemente noto come gene chip, chip a DNA, biochip o matrici ad alta densit\`a) \`e un insieme di microscopiche sonde di DNA attaccate ad una superficie solida come vetro, plastica, o chip di silicio formanti un array (matrice). Tali array consentono di verificare contemporaneamente la presenza di moltissimi geni all'interno di un campione di DNA (che spesso pu\`o rappresentare anche il genoma o il trascrittoma di un organismo). \par Un utilizzo tipico \`e quello di confrontare il profilo di espressione genica di un individuo malato con quello di un individuo sano per individuare quali geni sono coinvolti nella malattia, oppure scegliere il farmaco adatto in base all'espressione genica. Un microarray consente di estrarre l'espressione di oltre 20000 geni, dunque ogni campione di DNA viene descritto da oltre 20000 elementi, la maggior parte non correlati al dato processo di classificazione.\par Per ridurre la dimensionalit\`a si utilizzano tecniche di selezione delle features per selezionare solo alcune espressioni geniche, e.g. metodi signal to noise calcolano per ogni gene j (esempio valido per problema bi classe es malato + non malato -).
+	
+	\[S(j) = \frac{\mu_+(j)-\mu_-(j)}{\sigma_+(j)-\sigma_-(j)} \]
+	
+	dove $\mu_+$ e $\mu_-$ sono le medie delle classi +1 e -1 per il j-esimo gene. i geni che danno valori alti saranno correlati alla classe +1, quelli con valori molto negativi alla classe -1.
+		
+	\subsubsection{Immagini}
+	
+		\paragraph{Local binary pattern LBP}
+		The LBP feature vector, in its simplest form, is created in the following manner:
+		\begin{itemize}
+		
+			\item Divide the examined window into cells (e.g. 16x16 pixels for each cell).
+			\item For each pixel in a cell, compare the pixel to each of its 8 neighbors (on its left-top, left-middle, left-bottom, right-top, etc.). Follow the pixels along a circle, i.e. clockwise or counter-clockwise.
+			\item Where the center pixel's value is greater than the neighbor's value, write "0". Otherwise, write "1". This gives an 8-digit binary number (which is usually converted to decimal for convenience).
+			\item Compute the histogram, over the cell, of the frequency of each "number" occurring (i.e., each combination of which pixels are smaller and which are greater than the center). This histogram can be seen as a 256-dimensional feature vector.
+			\item Optionally normalize the histogram.
+			\item Concatenate (normalized) histograms of all cells. This gives a feature vector for the entire window.
+		
+		\end{itemize}
+		
+		The feature vector can now be processed using the Support vector machine, extreme learning machines, or some other machine-learning algorithm to classify images. Such classifiers can be used for face recognition or texture analysis.
+		
+		\begin{center}
+			\includegraphics[scale=0.6]{res/LBP.png} 
+		\end{center} 
+		
+		Formula per il calcolo della LBP centrato in $(x_c, y_c)$
+		\[LBP(x_c,y_c)=\sum_{p=0}^{7} 2^p\ s(i_p-i_c) \]
+		
+		$s(x)$ funzione segno dunque valuta uno se $i_s > i_c$. Sommare i valori ottenuto dal segno per $2^p$ serve per rappresentare il vettore binario ottenuto dal pixel $c$ in decimale.
+		
+		\paragraph{Extended local binary pattern}
+		Estensione di LBP per gestire intorni di dimensioni variabile. L'idea \`e quella di allineare un numero arbitrario di pixel vicini su di un cerchio di raggio invisibile.
+		\begin{center}
+			\includegraphics[scale=0.6]{res/ELBP.png} 
+		\end{center}
+		dove $R$ \`e il raggio di un punto e $P$ il numero di punti campione. Nota: lungo il raggio ci sono le potenze di 2: come prima estraggo un vettore binario per il centro con i confronti e poi moltiplico e sommo per rappresentarlo in decimale.
+		\textbf{Se le coordinate di un punto sul cerchio non corrispondono alle coordinate di un pixel dell'immagine, il punto viene interpolato}
+	
+		\paragraph{Filtri e filtri di gabor}
+		L'idea: per estrarre le features eseguire prodotti di convoluzione tra l'immagine e una serie di filtri (detti il banco) e di estrarre dalle immagini ottenute alcuni indicatori di sintesi (media, varianza, momento). Saranno questi a descrivere l'immagine: se per esempio uso 14 filtri e 2 indicatori (media e varianza) avr\`o un vettore di 28 featurese.
+		\par Un insieme di filtri molto usati sono i filtri di \textbf{Gabor}, per i quali sono state trovate forti analogie con alcuni meccanismi del sistema visivo umano. Ogni filtro \`e costituito da una funzione sinusoidale attenuata progressivamente da una gaussiana. Il filtro, costituito da una parte reale e una immaginaria, \`e regolato da 3 parametri
+		\begin{itemize}
+			\item [$\Box$] la frequenza della sinusoide $\omega$.
+			\item [$\Box$] l'orientazione della sinusoide $\theta$ rispetto al piano $x,y$.
+			\item [$\Box$]l'ampiezza della gaussiana $\sigma$.
+		\end{itemize}
+	
+		\paragraph{Focus su convoluzione}
+		
+		\textbf{Filtro digitale:} Una maschera di pesi che indica come ogni elemento dell'immagine debba essere modificato sulla base del valore dei pixel vicini.
+		\newline
+		\newline
+		Sia $F$ un filtro definito su una griglia $m\times m$ ($m$ dispari), l'applicazione di $F$ a un immagine $I$ nel punto $[i,j]$ modifica il pixel del punto $I[i.j]$ come segue:
+			\begin{center}
+				\includegraphics[scale=1]{res/convoluzione.png}
+			\end{center}
+		\textbf{Tale operazione di media pesata \`e detta convoluzione.}
+		Problema: complessit\`a computazionale parecchio elevata: data un immagine $n \times n$ pixel e un filtro di $m \times m$ elementi, la convoluzione richiede $m^2n^2$ moltiplicazioni e altrettante somme. \textbf{Soluzione: lavorare nello spazio delle trasformate di Fourier (trasformata \`e $O(nlog(n))$)}
+			\begin{center}
+				\includegraphics[scale=0.6]{res/fourier.png}
+			\end{center}
+		
+			\begin{center}
+				\includegraphics[scale=0.5]{res/gabor.png}
+			\end{center}
+	
+		\paragraph{Informazioni spaziali}
+		I descrittori appena visti, se calcolati sull'intera immagine, non mantengono informazioni di tipo spaziale. Per arricchire il descrittore con informazioni locali \`e possibile dividere l'immagine in regioni e calcolare per ciascuna i relativi descrittori. I.E. per divisione a 6 blocchi l'immagine sar\`a descritta da 6x features rispetto al descrittore per l'intera immagine
+		
+			\begin{center}
+				\includegraphics[scale=0.5]{res/regioni.png}
+			\end{center}
+	
+		\subsubsection{The dissimilarity space}
+		Si estraggono una serie di pattern "originali" che verranno utilizzati a mo di base per il dataset. I nuovi pattern sono descritti da una serie di numeri (vettore) dove ogni elemento della serie \`e la similarit\`a fra il dato pattern e uno dei pattern originali. In questo modo i pattern di base possono essere anche strutture complesse come grafi. In questo caso una serie di distanze tra i grafi sar\`a la rappresentazione vettoriale dei patterns. Defininizione originale:
+		
+			\begin{center}
+				\includegraphics[scale=0.5]{res/dissimilarity.png}
+			\end{center}
+			\begin{center}
+				\includegraphics[scale=0.5]{res/dissimilarity2.png}
+			\end{center}
+	
+		\subsection{Classificazione}
+		Classificazione: \textbf{assegnare una classe a un pattern}.
+		\begin{itemize}
+			\item [-] Necessario apprendere una \textbf{funzione che mappi lo spazio dei pattern nello spazio delle classi}.
+			\item [-] Si usa spesso il termine \textbf{riconoscimento}.
+			\item [-] Caso 2 classi \textbf{binary classification} , con pi\`u \textbf{multy-class classification}.
+		\end{itemize}
+	
+		Classe: insieme di pattern aventi propiet\`a comuni. Es due modi diversi di scrivere A. Il \textbf{concetto} di classe \`e semantico e dipende dall'applicazione: 21 classi per distinguere una lettera alfabeto ita, 2 per distinguere lettera ita da cirillico.
+		\par Esempi di problemi di classificazione: Spam detection, Credit card fraud detection, face reconition, Pedestrian classification, medical diagnosys, stock trading.
+		
+		\subsubsection{Regressione}
+			\begin{center}
+				\includegraphics[scale=0.5]{res/regressione.png}
+			\end{center}
+	
+		\subsubsection{Clustering}
+			\begin{center}
+				\includegraphics[scale=0.5]{res/clustering.png}
+			\end{center}
+			\begin{center}
+				\includegraphics[scale=0.4]{res/clusteringEs.png}
+			\end{center}
+		
+	\subsection{Riduzione di dimensionalit\`a}
+	Riduce il numero di dimensione dei pattern in input. Consiste nell'apprendimento di un mapping da $\mathbb{R}^d$ a $\mathbb{R}^k$ con $d < k$.\par L'operazione comporta una perdita di in Informazione. L'obbiettivo \`e conservare le informazioni importanti, poich\`e non \`e detto che tutte le features siano utili (alcune potrebbero portare rumore) eliminandole si pu\`o anche migliorare le prestazioni del classificatore. La \textbf{definizione formale di importante dipende dall'applicazione.}\par Questa procedura \`e molto utile per rendere trattabili problemi con dimensionalit\`a molto elevate, per scartare informazioni ridondanti e/o instabili, e per visualizzare in 2D o 3D pattern con $d>3$.
+	
+	\begin{center}
+		\includegraphics[scale=0.6]{res/dimensionalita.png}
+	\end{center}
+
+\newpage
+\section{Learning}
+	\subsection{Feature learning (ad esempio deep learning)}
+	Il successo del machine learning dipende dall'efficacia di rappresentazione dei pattern in termini di features. Si seguono due strade: o si crea un algoritmo ad hoc per estrarre le features a partire dai row data o si danno in input al sistema dati grezzi e il sistema estrae autonomamente le features dei pattern.
+		\begin{itemize}
+			\item [$\Box$] La \textbf{definizione di features ad-hoc (hand-crafted)} per le diverse applicazioni prende il nome di \textbf{feature engineering}. I metodi hand-crafted sono dunque quei metodi che data un immagine o un oggetto \textbf{estraggono un pattern che rappresenta il dato}. Il sistema ha in input i dati come l'umano li vuole rappresentare.\newline Ad esempio per il riconoscimento di oggetti esistono numerosi descrittori di forma, colore e tessitura che possiamo utilizzare per convertire immagini in vettori numerici.
+			\item [$\Box$]\textbf{Rapresentation Learning o features learning} fa tutto il sistema: la rete deep decide come rappresentare il dato a partire dai dati grezzi, estraendo da essi le features in maniera autonoma. Gran parte delle tecniche di deep learning operano in questo modo esempio CNN (convolutional neural networks).
+		\end{itemize}
+
+	\subsection{Apprendimento}
+		\subsubsection{Tipi di apprendimento}
+			\paragraph{Supervisionato o Supervised}
+				\begin{itemize}
+					\item [] Sono note le classi dei pattern per l'addestramento. Per ogni dato so a che classe appartiene, il \textbf{Training set \`e etichettato} (labeled). Situazione tipica nella classificazione, regressione e in alcune tecniche di riduzione della dimensionalit\`a.
+				\end{itemize}
+			
+			\paragraph{Non supervisionato o Unsupervised}
+				\begin{itemize}
+					\item [] Non sono note le classi dei pattern utilizzati per l'addestramento. \textbf{Il training set non \`e etichettato}. Situazione tipica: clustering ovvero trovare dei label per un insieme di pattern, e nella maggior parte di riduzione di dimensionalit\`a.
+				\end{itemize}
+			
+			\paragraph{Semi-supervisionato o Semi-supervised}
+				\begin{itemize}
+					\item [] \textbf{Il training set \`e parzialmente etichettato}. Non tutti i pattern hanno label, magri troppo costoso farli classificare da un esperto umano. Si usa il core etichettato come base per tutti i pattern. La distribuzione dei pattern non etichettati pu\`o aiutare a ottimizzare la regola di classificazione. 
+				\end{itemize}
+			
+			\paragraph{Altri tipi di apprendimento}
+				\begin{itemize}
+					\item \textbf{Multilabel}: un pattern viene assegnato a pi\`u classi, per esempio un articolo pu\`o essere di gossip, calcio, news contemporaneamente.
+					Esistono algoritmi ad hoc per gestire problemi multi-label. Vedi dispense per esempi di applicazioni.
+					\item \textbf{Active learning}: caso particolare di semi-supervised, ad ogni iterazione vengono scelti alcuni patterns senza label e fatti etichettare. Il sistema sceglie dunque quali pattern avere come labeled da un umano. Il sistema sceglie dunque autonomamente i patterns pi\`u utili o i pi\`u difficili ed un esperto umano fornisce il label. Il sistema ora sa nuovi pattern prima difficili. Il numero di patterns da far etichettare all'umano dipende dal costo del processo che il sistema compie per selezionare i pattern pi\`u utili.
+				\end{itemize}
+		
+		\subsubsection{Esempi di problemi di apprendimento}
+			
+			\begin{center}
+				\includegraphics[scale=0.6]{res/computerVision.png}
+			\end{center}
+		
+			\begin{center}
+				\includegraphics[scale=0.6]{res/biomedico.png}
+			\end{center}
+		
+		
+		\subsubsection{Tecniche di addestramento della rete}
+		
+			\paragraph{Batch}
+				\begin{itemize}
+					\item [] L'addestramento \`e fatto una sola volta alla creazione della rete su un training set dato. Una volta terminato il training la rete passa in working mode e non \`e pi\`u in grado di apprendere ulteriormente. Attualmente il maggior numero di sistemi di machine learning opera in questo modo. Generalmente approccio supervisionato.
+				\end{itemize}
+	
+			\paragraph{Incrementale}
+				\begin{itemize}
+					\item [] A seguito dell'addestramento iniziale, sono  possibili ulteriori sessioni di addestramento. Ogni $N$ tempo ri addestro la rete. Buona pratica \`e copiare la rete, lasciarne una on line nel mentre ri addestro al seconda, fare lo switch al termine dell'addestramento. Scenari: cicli di batch e working mode, i batch dopo il primo sono generalmente in unsupervised training. Rischio: catrastofic fogetting (la rete dimentica tutto ci\`o che ha imparato).
+				\end{itemize}
+			
+			\paragraph{Naturale}
+				\begin{itemize}
+					\item [] Addestramento continuo, per tutta la vita. Addestramento attivo in work-mode: ogni volta che arriva un pattern ri setta i parametri. Coesistenza di approccio supervisionato e non supervisionato. Human-like learning: inizialmente un piccolo pool di istruzioni (il labeling dei genitori durante l'infanzia) arricchito da grosso ammontare di esperienze non supervisionate.
+				\end{itemize}
+			
+	\subsection{Reinforcement Learning}
+	\textbf{Apprendere un comportamento}: l'obbiettivo \`e apprendere un comportamento a partire da esperienze passate. Un agente esegue azioni che modificano l'ambiente provocando un passaggio di stato. Quando l'agente ottiene risultati positivi riceve un reward che per\`o pu\`o essere temporalmente ritardato rispetto all'azione, o alla sequenza di azioni che lo hanno determinato. L'obbiettivo \`e apprendere le azioni ottimali in ciascuno stato, in modo da massimizzare la somma dei reward ottenuti nel lungo periodo.\par Nella pratica non\`e facile ottenere esempi che siano allo stesso tempo corretti e rappresentativi di tutte le situazioni in cui l'agente deve agire. Pertanto il classico approccio supervisionato non \`e facilmente applicabile. Si pu\`o per\`o far operare l'agente in una realt\`a virtuale per potergli far fare migliaia di simulazioni al giorno.\par Q learning \`e uno degli approcci pi\`u usati. La sua estensione deep, ovvero Deep Reinforcment Learning \`e alla base di Google DeepMind.
+	
+	\subsection{Ottimizzazione di parametri} 
+	In generale un algoritmo di machine learning \`e regolato da un insieme di parametri $\Theta$ (esempio i pesi delle connessioni in una rete neurale). L'apprendimento consiste nel determinare il valore ottimo di $\Theta^*$ di questi parametri.
+	\par Dato un training set $Trainin$ e un insieme di parametri $\Theta$, la funzione obbiettivo $f(Train, \Theta)$ pu\`o indicare:
+		\begin{itemize}
+			\item [-]l'ottimalit\`a della soluzione, da massimizzare
+			\[ \Theta^* = argmax_\Theta f(Train, \Theta)\]
+			
+			\item [-]l'errore o la perdita (loss-function) da minimizzare
+			\[ \Theta^* = argmin_\Theta f(Train, \Theta)\]
+		\end{itemize}		
+	Nella pratica si divide il data-set in due: un parte comporr\`a il train set, l'altra il test set. Solo il train set viene utilizzato per ottimizzare i parametri. Il test set viene utilizzato in un secondo momento per capire la bontat\`a del mio sistema. Si dice pertanto che il test set \`e blind, il nostro modello non pu\`o vederlo.
+	\newline \\		
+	$f(Train, \Theta)$ pu\`o essere ottimizzata in due modi:
+		\begin{itemize}
+			\item [-] \textbf{Esplicitamente} con metodi che operano a partire dalla sua definizione matematica. Per esempio calcolando le derivate parziali rispetto ai parametri (gradiente) porlo uguale a zero e risolvere nei parametri.
+			
+			\item [-] \textbf{Implicitamente} utilizzando un euristica che modifichi i parametri (come un algoritmo genetico).
+		\end{itemize}
+	
+		\subsubsection{Parametri vs Iperparametri}
+		Molti algoritmi oltre all'ottimizzazione di parametri $\Theta$ necessitano la definizione di iperparametri $H$. Questi iperparametri sono scelti prima dell'apprendimento vero e proprio e sono scelti da chi va a definire l'agente o l'intelligenza. In generale gli iperparametri $H$ definiscono com'\`e fatto l'algorimto, i parametri sono i $\Theta$ che dovranno essere ottimizzati con l'addestramento.
+		\par Esempi di iperparametri sono: il numero di neuroni in una rete neurale, il numero di vincoli $k$ in un classificatore $k-nn$, il grado di un polinomi utilizzato in regressione, il tipo di loss-function.
+	
+	\subsection{Valutazione delle prestazioni}
+	Sono possibili diverse tecniche:
+	\begin{itemize} 
+		\item [$\Box$] Utilizzare direttamente la funzione obbiettivo per classificare le prestazioni. Si preferisce per\`o in generale una misura pi\`u direttamente legata alla semantica del problema.
+		\item [$\Box$] In un problema di classificazione, l'\textbf{accuratezza} di classificazione \`e la percentuale di pattern correttamente classificati. L'errore di classificazione \`e il complemento.
+		\[ accuratezza = \frac{pattern \ \ correttamente\ \ classificati}{pattern\ \ classificati}\] \[errore = 1-accuratezza\]
+		\item [$\Box$] Nei problemi di \textbf{regressione} si valuta in genere RMSE (Root Mean Squared Error, scarto quadratico medio, radice della varianza). 
+		\[ RMSE = \sqrt{\frac{1}{N} \sum_{j=1...N}(pred_i-true_i)^2}  \]
+		\item [$\Box$] 	Nei problemi di \textbf{classificazione} (multiclasse) molto utile \`e la matrice di confusione per capire come sono distribuiti gli errori. Nel caso ideale vorremmo la matrice diagonale. Una tecnica per migliorare le prestazioni \`e aggiungere informazione: per le fragole oltre colore e forma anche la trama della pelle.
+			\begin{center}
+				\includegraphics[scale=0.6]{res/MatricePsiduck.png}
+			\end{center}
+	\end{itemize}
+
+	\subsection{Closed set e Open set}
+	Nel caso pi\`u semplice (e pi\`u comune nei benchmarck di machine learning) si assume che il pattern da classificare appartenga ad una delle classi note per esempio {uomini, donne}. Questo \`e detto \textbf{closed set}. In molti casi reali invece i pattern da classificare possono appartenere a una delle classi note o a nessun di queste \textbf{open set}. Es classificatore di frutta {mele, banane, pere} riceve in input kiwi o ciliegie. 
+	\newline Due soluzioni
+		\begin{itemize}
+			\item [$\Box$] Si aggiunge una classe fittizia "il resto del mondo" e si aggiungono al traning set i cosiddetti "esempi negativi".
+			\item [$\Box$] Si consente al sistema di non assegnare il pattern. A tal fine si definisce una soglia e si assegna il pattern alla classe solo quando la probabilit\`a superiore alla soglia.
+		\end{itemize}
+		
+	\subsection{Classificatore a soglia}
+	Consideriamo un problema di classificazione binario dove le due classi corrispondono a esempi positivi (vera classe) e negativi (classe fittizia resto del mondo). \`E un problema a closed set, per esempio Face detection: se nell'immagine c'\`e un volto posito altrimenti negativo. Possiamo trasformare questo problema in uno a Open set: consideriamo solo la classe positiva e un sistema con soglia $t$ in grado di calcolare la probabilit\`a $p$ che un immagine appartenga alla classe. Il pattern viene assegnato alla classe solo se $p > t$.
+
+		\subsubsection{Errore di classificazione}
+		Dati $N$ pattern da classificare, il risultato di ciascuno dei tentativi del classificatore pu\`o essere:
+		\begin{itemize}
+			\item [$\Box$] \textbf{True Positive (TP)} pattern positivo assegnato positivi.
+			\item [$\Box$] \textbf{True Negative (TN)} pattern negativo assegnato ai negativi.
+			\item [$\Box$] \textbf{False Positive (FP)} pattern negativo assegnato ai positivi.
+			\item [$\Box$] \textbf{False Negative (FN)} pattern positivo assegnato ai negativi.
+		\end{itemize}
+ 
+ 		Le frequenze dei due tipi di errore sono:
+ 					\[False \ positive \ rate \ = \ \frac{FP}{N_p} \]
+		 			\[False \ negative \ rate \ = \ \frac{FN}{N_n} \]
+ 	
+ 		Entrambi mi dicono che percentuale di errore c'\`e tra tutti i pattern assegnati positivi ($N_p$) e negativi ($N_n$).
+ 	
+ 		\subsubsection{La scelta della soglia}
+ 		Soglie restrittive (elevate) riducono i False positive alzando i False negative, viceversa soglie tolleranti riducono i Falsi negati a discapito dei falsi positivi.
+		\begin{center}
+ 			\includegraphics[scale=0.4]{res/FPRFNR.png}
+ 	 	\end{center}
+ 		Altre rappresentazioni:
+ 		\begin{center}
+ 			\includegraphics[scale=0.45]{res/Soglia.png}
+		\end{center}
+ 	
+ 		\begin{center}
+ 			\includegraphics[scale=0.45]{res/Soglia2.png}
+ 		\end{center}
+ 		
+ 		\subsubsection{Precision recall}
+ 		\begin{center}
+ 			\includegraphics[scale=0.45]{res/PrecisionRecall.png}
+ 		\end{center}
+
+		\textbf{Matrice di confusione}
+		\`e un altra rappresentazione grafica per comprendere prescision recall, come gi\`a visto in valutazione delle prestazioni. Nell'esempio il classificatore binario ha come classe positiva il digit $5$ e negativa tutti gli altri. 
+		\begin{center}
+			\includegraphics[scale=0.5]{res/MatriceConfusa.png}
+		\end{center}
+	
+	\subsection{Training, Validation, Test}
+	\begin{itemize}
+		\item [$\Box$] \textbf{Training Set o Train} \`e l'insieme dei pattern su cui il sistema si addestra, trovando il valore ottimo dei parametri $\Theta$.
+		\item [$\Box$] \textbf{Validation Set o Valid} \`e l'insieme di pattern su cui tarare gli iperparametri $H$. 
+		\item [$\Box$] \textbf{Test Set o Test} \`e l'insieme dei pattern su cui valutare le prestazioni finali del sistema. 
+		\begin{itemize}
+				\item [] MAI SETTARE IPERPARAMETRI SU TEST SET pena OVERFITTING (sovrastima delle prestazioni, vedi poi).
+				\item [] 	MAI  USARE  TEST  SET  SE  NON PER LA VALIDAZIONE FINALE.
+				\item [] 	MAI USARLO PER EFFETTUARE SCELTE INERENTI IL MODELLO. 
+		\end{itemize}
+	\end{itemize}
+	Nei benchmark di machine learning la suddivisione dei pattern \`e spesso predefinita per rendere confrontabili i risultati. Se non fosse cosi si procede come di seguito. Spiegazione con esempio, dati 12000 pattern:
+	\begin{center}
+		\includegraphics[scale=0.47]{res/set.png}
+	\end{center}
+	
+	\subsection{Convergenza}
+	Primo obbiettivo da perseguire durante il training: convergenza sul Training Set.
+	In un classificatore a addestramento iterativo si ha convergenza quando:
+	
+	\begin{itemize}
+		\item [-] Il Loss (output della loss function) ha un andamento decrescente. 
+		\item [-] L'accuratezza ha un andamento crescente.
+	\end{itemize}
+	
+	\begin{center}
+		\includegraphics[scale=0.5]{res/convergenza.png}
+	\end{center}
+	Se il Loss non decresce o oscilla significativamente il sistema non converge: il metodo di ottimizzazione non \`e efficace, gli iperparametri sono fuori range, il learning \`e inadeguato, ci sono errori di implementazione ecc.\par Se il loss decresce ma l'accuratezza non cresce, probabilmente \`e stata scelta una loss non adeguata.\par Se l'accuratezza non si avvicina al 100\% sul Train i gradi di libert\`a del classificatore non sono sono sufficienti per gestire la complessit\`a del problema, oppure features non adatte a descrivere patterns, poichi patterns, il problema \`e molto complesso.
+	
+	\subsection{Overfitting}
+	Una volta ottenuta la convergenza su Train si vuole massimizzare l'accuratezza su Valid. Il nostro scopo \`e infatti di creare un sistema in grado di generalizzare ovvero di trasportare la sua capacit\`a acquisita sul Train nel Valid. Dagli esempi imparati comportarsi bene con esempi non noti.
+	\par\textbf{Pericolo:} se i gradi di libert\`a sono eccessivi, si raggiunge elevata accuratezza sul Train ma non sul Valid. Il sistema \`e scarsco a generalizzare. In questo caso si parla di \textbf{overfitting di train}, bravo in quello che conosce scarso nell'ignoto. Questa situazione si verifica spesso se il Train \`e di piccole dimensioni.
+	\begin{center}
+		\includegraphics[scale=0.47]{res/overfitting.png}
+	\end{center}
+	Nei processi di addestramento iterativo, tipicamente dopo un certo numero di iterazioni, l'accuratezza su Valid non aumenta (pu\`o diminuire) a causa dell'overfitting. Monitorando l'andamenti su ou\`o interrompere l'addestramento nel punto ideale.\par \textbf{I gradi di libert\`a non devono essere ecessivi ma adeguati alla complessit\`a del problema.} Buona norma \`e partire con pochi gradi di libert\`a e via via aumentarli monitorando accuratezza su Train e Valid.
+	\begin{center}
+		\includegraphics[scale=0.34]{res/nellapratica.png}
+	\end{center}
+
+\section{Metodi di classificazione}
+	\subsection{Approccio bayesiano}
+	Il problema \`e posto in termini probabilistici. Se tutte le distribuzioni il gioco sono note l'approccio Bayesiano costituisce la migliore regola si classificazione possibile: \textbf{soluzione ottima}.
+	\begin{itemize}
+		\item [$\Box$] Sia $V$ uno spazio $d$- dimensionale e $W = {w_1, w_2 ... w_3}$ un insieme di $s$ classi disgiunte costituite da elementi di $V$.
+		\item [$\Box$] $\forall x \in V \ e \ \forall w_i \in W$, indiciamo con $p(x|w_i)$ la probabilit\`a condizionale (o condizionata) di $x$ data $w_i$ ovvero la densit\`a di probailit\`a che il prossimo pattern sia $x$ sotto l'ipotesi che la sua classe di appartenenza sia $w_i$.
+		\item [$\Box$] $\forall w_i \in W$, $p(w_i)$ \`e la \textbf{probabilit\`a a priori} ovvero la probabilit\`a indipendente dall'osservazione che il prossimo pattern da classificare sia di classe $w_i$. Un approccio semplice \`e le occorrenza nel train.
+		\item [$\Box$] $\forall x \in V$ indichiamo con $p(x)$ la \textbf{densit\`a a posteriori} di $x$ ovvero la densit\`a di probabilit\`a che il prossimo pattern da classificare sia $x$.
+		\[ p(x) = \sum_{i=1}^{s}p(x|w_i)\cdot p(w_i)\]
+		
+		\item [$\Box$] $\forall x \in V \ e \ \forall w_i \in W$ indichiamo con $p(w_i|x)$ la \textbf{probabilit\`a a posteriori} di $w_i$ dato $x$ ovvero la probabilit\`a che avendo osservato il pattern $x$ la sua classe di appartenenza si $w_i$. Questa va definita mediante vari approcci ad esempio NEAREST NEIGHBORHOOD.
+	\end{itemize}
+	
+	Per il teorema di Bayes:
+	\[ p(w_i|x) = \frac{p(x|w_i) \cdot p(w_i)}{p(x)}\]
+	Regola di classificazione di Bayes, si assegna a $x$ la classe $b$:
+	\[b = argmax_{i=1\dots s} \{p(w_i| x)\} \]
+	Massimizzare la probabilit\`a a posteriori significa massimizzare la densit\`a di probabilit\`a condizionale tenendo comunque conto della probabilit\`a delle classri. La regola si dimostra ottima in quanto minimizza la probabilit\`a di errore di classificazione.
+	
+		\subsubsection{Bayes: parametrico e non-parametrico}
+		Mentre la stima delle probabilit\`a a priori \`eabbastanza semplice (se non si hanno elementi si possono ipotizzare classi equiprobabili), la conoscenza delle densit\`a condizionali $p(x|w_i)$ \`e possibile solo in teoria. Nella pratica si seguono due soluzioni.
+		\subparagraph{Approccio Parametrico} si fanno \textbf{ipotesi sulla forma delle distribuzioni a priori} (es distribuzione multinormale) senza guardare i dati e si apprendono i parametri fondamentali (vettore medio, matrice covarianza) dal training set.
+		\subparagraph{Approccio non Parametrico} si apprendono le distribuzioni dal training set (es metodo di Parzen Window). Dai dati tiro fuori un \textbf{modello di distribuzione a posteriori}. 		
+
+		\subsubsection{Bayes parametrico}
+		Si utilizza quando, oltre ad avere una ragionevole certezza (o speranza) che la forma della distribuzione sia adeguata, la dimensione del training set non \`e sufficiente per una buona stima delle densit\`a. Questo approccio \`e caratterizzato da un minor numero di gradi di libert\`a rispetto all'approccio non parametrico, e quindi rischia meno l'overfitting sopratutto in dataset piccoli.
+
+			\paragraph{Distribuzione Normale}	
+			\begin{center}
+				\includegraphics[scale=0.45]{res/DistribuzioneNormale.png}
+			\end{center}
+		
+			\paragraph{Multinormale}	
+			\begin{center}
+				\includegraphics[scale=0.45]{res/Multinormale.png}
+			\end{center}
+			\paragraph{Multivariata}		
+			\begin{center}
+				\includegraphics[scale=0.45]{res/Multivariata.png}
+			\end{center}
+			\paragraph{Distanza di Mahalanobis}
+			\begin{center}
+				\includegraphics[scale=0.35]{res/Mahalanobis.png}
+			\end{center}
+	
+			\paragraph{Bayes con Multinormali}
+			\begin{center}
+				\includegraphics[scale=0.45]{res/BayesMulti1.png}
+			\end{center}
+			\begin{center}
+				\includegraphics[scale=0.37]{res/BayesMulti2.png}
+			\end{center}
+				
+			\paragraph{Bayes Parametrico riassunto}
+			Grandissimo vantaggio classificatore di bayes: da un valore output probabilistico che pu\`o essere usato come confidenza.
+			\par Un classificatore assegna quindi un pattern a una classe con una certa certezza (o confidenza) ch pu\`o essere usata per scartare pattern in applicazioni open-set con soglia o costruire un multi classificatore. Se non si \`e interessati alla confidenza basta non dividere per $p(x)$:
+
+			\[b = argmax_{i=1\dots s} \{p(x|w_i) \cdot p(w_i)\} \]
+			
+			Il classificatore minimizza l'errore di classificazione, ad esempio nel caso 2 classi e $d=1$.
+			\begin{center}
+				\includegraphics[scale=0.5]{res/minErrore.png}
+			\end{center}
+			
+			\paragraph{In pratica}
+			\subparagraph{}
+			Spesso si azzarda ipotesi di normalità delle densità senza verifiche sperimentali , ciò porta a cattivi risultati di classificazione.
+			Pertanto, dato un training set significativo deve essere innanzitutto valutata la rispondenza alla normalità. Ciò pu\`o essere fatto in due modi: 
+			\begin{itemize}
+				\item[$\Box$]In modo formale, esempio test statistico di Malkovich.
+				\item[$\Box$]In modo empirico, esempio visualizzando in vari modi i dati o gli istogrammi sulle diverse componenti e confrontandoli con le diverse curve teoriche.
+			\end{itemize}
+			Un volta provata una normalità bisogna stimare a partire dai dati il vettore medio e la matrice di covarianza. Le probabilità a priori possono essere poste tutte uguali o estratte dalla percentuale di campioni che nel training set appartengono alle diverse classi. Ogni nuovo pattern da classificare è una delle possibili classi in accordo con le regole di Bayes nella quale media e covarianza sono ora note.
+			
+		\subsubsection{Approcci Bayes non parametrici}
+		Tecnologia usata ancora oggi. Non vengono fatte ipotesi sulle distribuzioni dei dei pattern e le densità di probabilità sono stime dirette del training set.
+		Il problema della stima accurata delle densità è ritenuto da molti un problema più complesso della classificazione, perché risolvere sotto problema più complesso dell'originale? In genere la stima di densità è affrontabile per dimensionalità ridotte ($\mathbb{R}^3$) ed esplode alla crescita delle dimensioni, volumi vuoti iniziano a essere enormi e i pattern sparsi.
+		
+		\paragraph{Parzen Window}
+		\subparagraph{}
+		Si parte dalla densità di distribuzione binomiale. Dati $n$ pattern indipendenti, la probabilità che $k$ di questi cadano nella regione $\mathfrak{R}$ che ho scelto è:
+		
+		\[P_k = {n\choose k}p^k(1-p)^{n-k}\]
+		Nota in media il numero di pattern che cadono nella regione tende alla media della binomiale $k\simeq E[P_k] $
+		il cui valore medio $k\simeq E[P_k]=n\cdot p$ e quindi \[p = k/n\]
+				
+		Calcoliamo ora il parametro $p$ come la probabilità che un pattern x cada al'interno di $\mathfrak{R}$ e assumendo che la regione sia piccola di volume $V$ e che $p(\cdot)$ non vari significativamente al suo interno:
+		\[p = \int_\mathfrak{R} p(x')d(x')\simeq p(x) \cdot V \]
+		
+		Ma allora:
+		\[p(x) =\ \frac{p}{V} \ =\ \frac{k}{n\cdot V}\]
+		
+		Si sceglie come regione $\mathfrak{R}$ un ipercubo in generale $d-dimensionale$, chiamato Finestra o Window definito dalla funzione:
+		
+		\[\varphi(u) = \bigg \{
+		\begin{array}{rrr}
+		1 & \ \ |u_j| \leq 1/2 & \ \ j = 1\dots d \\
+		0 & altrimenti \\
+		\end{array}
+		\]
+		
+		Dato un generico ipercubo centrato in $x$ e avente lato $h_n$ (e quindi volume $V_n = {h_n}^d$), contiamo il numero di pattern al suo interno:
+		\[ k_n = \sum_{i=1}^{n}\varphi\bigg (\frac{x_i-x}{h_n}\bigg) \]
+		
+		sostituendo in $k_n$ si ottiene:
+		\[p_n(x) = \frac{1}{n \cdot V_n} \sum_{i=1}^{n}\varphi\bigg (\frac{x_i-x}{h_n}\bigg) \ \ \ \ \ \ \ dove \ \ \  V_n =  {h_n}^d \]
+		\textbf{Abbiamo così stimato la probabilità che $x$ caschi in $n$ ovvero la probabilità di osservare x sapendo che cascherà in n $p(x|n)$. }
+		\\
+		\par
+		Ovviamente, sopratutto nel caso in cui numero ridotto di pattern, la dimensione della finestra (e quindi del lato) influiscono sul risultato: se la finestra \`e piccola la stima risulta piuttosto "rumorosa", molto attratta dai campioni e statisticamente instabile; se la finestra è grande la stima è più stabile ma piuttosto vaga a e sfuocata. Si dimostra che per ottenere convergenza la dimensione della finestra deve essere calcolata tenendo conto del numero di campioni del training set: $V_n = \frac{V_1}{\sqrt{n}}$ dove $V_1 \ o\ h_1$ sono iperparametri.
+		\subparagraph{Nella pratica} invece di ipercubi, come funzioni per le finestre si utilizzano \textbf{kernel function} più soft in cui ogni pattern contribuisce alla stima di densità di un intorno di $x$ in accordo alla distanza da $x$. In questi modo si ottengono superfici decisionali molto più regolari. Le kernel function devono essere funzioni di densità, un approccio può essere una multinormale a media nulla e matrice di covarainza unitaria.
+		
+		\subsection{Nearest Neighbor (NN)}
+		Invece di derivare dai dati la distribuzione condizionale delle classi per usare bayes, questo classificatore cerca in modo pragmatico di massimizzare direttamente la probabilità a posteriori, infatti se il nuovo pattern $x'$ è molto vicino a un pattern noto $x$ allpra è lecito pensare che $p(w_i|x')\approx p(w_i|x)$
+		\par Data una matrice $dist(\cdot)$ nello spazio multidimensionale (es. distanza euclidea), il classificatore assegna al nuovo pattern $x'$ la stessa classe dell'elemento del TS (training set) più vicino.
+		\[ dist(x',x) = \min_{x\in TS} \{dist (x', x_i)\} \]
+	
+		Si poù dimostrare che nell'ipotesi di TS popolato da infiniti campioni, la probabilità $P$ di errore nell'approccio NN non è mai peggiore (superiore) al doppio dell'errore possibile con Bayes. In pratica però questo non significa che l'approccio Bayesinao fornisca sempre risultati migliori di NN, se la stima di denistà condizionale è poco accurata il classificatore di Bayes può andare peggio.
+		
+		\subsubsection{K-NN}
+		La regola NN produce una partizione dello spazio nota come tassellazione di Voronoi ovvero ogni elemento $x_i \ \in \ TS$ determina un tassello all'interno del quale i pattern saranno assegnati alla classe $x_i$.
+		
+		\begin{center}
+			\includegraphics[scale=0.5]{res/tassselazione.png}
+		\end{center}
+		
+		Regola piuttosto radicale: basta che un elemento non sia ben etichettato o affidabile, \textbf{Outlier}, affinché tutti i pattern nelle sue vicinanze siano etichettati male. \par Un modo più robudto è quello di allargare il vicinato a $k$ vicini: determino i k elementi più vicini al nuovo pattern $x'$ da classificare (k è un iperparametro); ogni pattern tra i $k$ vicini vota per la propria classe di appartenenza come classe da assegnare al nuovo pattern. La classe che ottiene più voti viene assegnata a $x'$.  
+		\begin{center}
+			\includegraphics[scale=0.5]{res/knn.png}
+		\end{center}
+		Per TS infiniti k-NN si dimostra meglio di 1-NN (solito NN) e all'aumentare di k converge all'errore bayesiano. Nella pratica (TS limitati) aumentare k cignifica estendere l'ipersfera di ricerca andando a sondare le probabilità a posteriori lontano dal punto di interesse; il valore ottimale di k (solitamente $< 10$) va stimato su un validation set separato.
+		Estrarre confidenza da k-NN, chiamiamo $v_i$ i voti che il pattern ha ottenuto dalla classe $i$, siano $s$ in tutto le classi:
+		
+		\[ confidenza = \bigg[ v_1/k,\dots,v_s/k \bigg] \]
+		il nuovo pattern appartiene alla classe $i$ con probabilità $ v_i/k$.
+		In TS a numerosità elevate k-NN diventa problematico: necessario memorizzare tutti i pattern del TS, per ogni classificazione necessario calcolare la distanza da tutti i pattern del TS e ordinare le distanza per ottenere le più piccole. Quando l'efficienze è importante è consigliabile indicizzare i dati attraverso strutture dati spaziali (es. kd-tree) che consente di individuare i vicini senza ricerca esaustiva. Sono strutture dati che consentono di trovare i vicini in tempo logaritmico, ovviamente in cambio c'è un maggiore costo ogni volta che si inserisce un nuovo pattern nel train. 
+\newpage
+\section{Clustering}
+\newpage
+\section{Riduzione di dimensionalit\`a}
+\newpage
+\section{Reti neurali e deep learning}
+
+
+\end{document}
